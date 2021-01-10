@@ -8,7 +8,7 @@ class ProjectInput {
 
 		const importedFormElement = document.importNode(this.formTemplate.content, true);
 		this.formElement = importedFormElement.firstElementChild as HTMLFormElement;
-
+		this.formElement.id = 'user-input';
 		this.insertForm();
 	}
 
@@ -17,4 +17,4 @@ class ProjectInput {
 	}
 }
 
-const project = new ProjectInput();
+const projectInput = new ProjectInput();
