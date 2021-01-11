@@ -1,3 +1,33 @@
+interface Validatable {
+	value: string | number;
+	isRequired?: boolean;
+	minLength?: number;
+	maxLength?: number;
+	min?: number;
+	max?: number;
+}
+
+function validate(validatableInput: Validatable) {
+	let isValid = true;
+
+	if (validatableInput.isRequired) {
+		isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+	}
+	if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+		isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+	}
+	if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+		isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+	}
+	if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+		isValid = isValid && validatableInput.value >= validatableInput.min;
+	}
+	if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+		isValid = isValid && validatableInput.value <= validatableInput.max;
+	}
+	return isValid;
+}
+
 class ProjectInput {
 	formTemplate: HTMLTemplateElement;
 	wrapperDiv: HTMLDivElement;
@@ -26,11 +56,28 @@ class ProjectInput {
 		const description = this.descriptionInput.value;
 		const people = this.peopleInput.value;
 
-		if (
-			title.trim().length === 0 ||
-			description.trim().length === 0 ||
-			people.trim().length === 0
-		) {
+		const titleValidatable: Validatable = {
+			value: title,
+			isRequired: true,
+			minLength: 5,
+			maxLength: 10,
+		};
+
+		const descValidatable: Validatable = {
+			value: description,
+			isRequired: true,
+			minLength: 10,
+			maxLength: 100,
+		};
+
+		const peopleValidatable: Validatable = {
+			value: people,
+			isRequired: true,
+			min: 1,
+			maxLength: 5,
+		};
+
+		if (!validate(titleValidatable) && !validate(descValidatable) && !validate(peopleValidatable)) {
 			alert('Inputs cannot be empty');
 			return;
 		} else {
