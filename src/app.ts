@@ -110,4 +110,31 @@ class ProjectInput {
 	}
 }
 
+class ProjectList {
+	projectTemplate: HTMLTemplateElement;
+	sectionElement: HTMLElement;
+	wrapperDiv: HTMLDivElement;
+	constructor(private type: 'active' | 'finished') {
+		this.projectTemplate = document.getElementById('project-list')! as HTMLTemplateElement;
+		this.wrapperDiv = document.getElementById('app')! as HTMLDivElement;
+
+		const importedNode = document.importNode(this.projectTemplate.content, true);
+		this.sectionElement = importedNode.firstElementChild as HTMLElement;
+		this.sectionElement.id = `${this.type}-projects`;
+		this.insertProjectList();
+		this.renderContent();
+	}
+
+	private renderContent() {
+		const listId = `${this.type}-project-list`;
+		this.sectionElement.querySelector('ul')!.id = listId;
+		this.sectionElement.querySelector('h2')!.innerText = this.type.toUpperCase() + ' PROJECTS';
+	}
+
+	private insertProjectList() {
+		this.wrapperDiv.insertAdjacentElement('beforeend', this.sectionElement);
+	}
+}
 const projectInput = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const finishedProjectList = new ProjectList('finished');
