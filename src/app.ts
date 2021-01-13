@@ -1,7 +1,23 @@
+//Project class
+enum ProjectStatus {
+	Active,
+	Finished,
+}
+
+class Project {
+	constructor(
+		public id: string,
+		public title: string,
+		public description: string,
+		public numPeople: number,
+		public status: ProjectStatus
+	) {}
+}
+
 //Project State
 
 class ProjectState {
-	private projects: any[] = [];
+	private projects: Project[] = [];
 	private listners: any[] = [];
 
 	private static instance: ProjectState;
@@ -21,12 +37,14 @@ class ProjectState {
 	}
 
 	addProject(title: string, description: string, numPeople: number) {
-		this.projects.push({
-			id: Math.random().toString(),
-			title: title,
-			description: description,
-			numPeople: numPeople,
-		});
+		const newProject = new Project(
+			Math.random().toString(),
+			title,
+			description,
+			numPeople,
+			ProjectStatus.Active
+		);
+		this.projects.push(newProject);
 		for (const listner of this.listners) {
 			listner(this.projects.slice());
 		}
@@ -151,7 +169,7 @@ class ProjectList {
 	projectTemplate: HTMLTemplateElement;
 	sectionElement: HTMLElement;
 	wrapperDiv: HTMLDivElement;
-	assingedProjects: any[] = [];
+	assingedProjects: Project[] = [];
 	constructor(private type: 'active' | 'finished') {
 		this.projectTemplate = document.getElementById('project-list')! as HTMLTemplateElement;
 		this.wrapperDiv = document.getElementById('app')! as HTMLDivElement;
