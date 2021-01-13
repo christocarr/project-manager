@@ -1,3 +1,40 @@
+//Project State
+
+class ProjectState {
+	private projects: any[] = [];
+	private listners: any[] = [];
+
+	private static instance: ProjectState;
+
+	private constructor() {}
+
+	static getInstance() {
+		if (this.instance) {
+			return this.instance;
+		}
+		this.instance = new ProjectState();
+		return this.instance;
+	}
+
+	addListner(listner: Function) {
+		this.listners.push(listner);
+	}
+
+	addProject(title: string, description: string, numPeople: number) {
+		this.projects.push({
+			id: Math.random().toString(),
+			title: title,
+			description: description,
+			numPeople: numPeople,
+		});
+		for (const listner of this.listners) {
+			listner(this.projects.slice());
+		}
+	}
+}
+
+const projectState = ProjectState.getInstance();
+
 interface Validatable {
 	value: string | number;
 	isRequired?: boolean;
@@ -97,7 +134,7 @@ class ProjectInput {
 		const userInput = this.getUserInput();
 		if (Array.isArray(userInput)) {
 			const [title, description, people] = userInput;
-			console.log(title, description, people);
+			projectState.addProject(title, description, people);
 		}
 	}
 
@@ -114,6 +151,7 @@ class ProjectList {
 	projectTemplate: HTMLTemplateElement;
 	sectionElement: HTMLElement;
 	wrapperDiv: HTMLDivElement;
+	assingedProjects: any[] = [];
 	constructor(private type: 'active' | 'finished') {
 		this.projectTemplate = document.getElementById('project-list')! as HTMLTemplateElement;
 		this.wrapperDiv = document.getElementById('app')! as HTMLDivElement;
@@ -121,8 +159,23 @@ class ProjectList {
 		const importedNode = document.importNode(this.projectTemplate.content, true);
 		this.sectionElement = importedNode.firstElementChild as HTMLElement;
 		this.sectionElement.id = `${this.type}-projects`;
+
+		projectState.addListner((projects: any[]) => {
+			this.assingedProjects = projects;
+			this.renderProjects();
+		});
+
 		this.insertProjectList();
 		this.renderContent();
+	}
+
+	renderProjects() {
+		const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLElement;
+		for (const projectItem of this.assingedProjects) {
+			const listItem = document.createElement('li');
+			listItem.textContent = projectItem.title;
+			listEl.appendChild(listItem);
+		}
 	}
 
 	private renderContent() {
