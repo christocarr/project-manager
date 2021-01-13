@@ -16,9 +16,11 @@ class Project {
 
 //Project State
 
+type Listner = (item: Project[]) => void;
+
 class ProjectState {
 	private projects: Project[] = [];
-	private listners: any[] = [];
+	private listners: Listner[] = [];
 
 	private static instance: ProjectState;
 
@@ -32,7 +34,7 @@ class ProjectState {
 		return this.instance;
 	}
 
-	addListner(listner: Function) {
+	addListner(listner: Listner) {
 		this.listners.push(listner);
 	}
 
@@ -178,8 +180,14 @@ class ProjectList {
 		this.sectionElement = importedNode.firstElementChild as HTMLElement;
 		this.sectionElement.id = `${this.type}-projects`;
 
-		projectState.addListner((projects: any[]) => {
-			this.assingedProjects = projects;
+		projectState.addListner((projects: Project[]) => {
+			const filteredProjects = projects.filter((project) => {
+				if (this.type === 'active') {
+					return project.status === ProjectStatus.Active;
+				}
+				return project.status === ProjectStatus.Finished;
+			});
+			this.assingedProjects = filteredProjects;
 			this.renderProjects();
 		});
 
@@ -189,6 +197,7 @@ class ProjectList {
 
 	renderProjects() {
 		const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLElement;
+		listEl.innerHTML = '';
 		for (const projectItem of this.assingedProjects) {
 			const listItem = document.createElement('li');
 			listItem.textContent = projectItem.title;
