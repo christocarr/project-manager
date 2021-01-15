@@ -191,6 +191,31 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 	}
 }
 
+//Project Item Class
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+	private project: Project;
+	get numPersons() {
+		if (this.project.numPeople === 1) {
+			return '1 person assigned';
+		} else {
+			return `${this.project.numPeople} people assigned`;
+		}
+	}
+	constructor(hostId: string, project: Project) {
+		super('single-project', hostId, false, project.id);
+		this.project = project;
+
+		this.configure();
+		this.renderContent();
+	}
+	configure() {}
+	renderContent() {
+		this.element.querySelector('h2')!.textContent = this.project.title;
+		this.element.querySelector('h4')!.textContent = this.numPersons;
+		this.element.querySelector('p')!.textContent = this.project.description;
+	}
+}
+
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 	assingedProjects: Project[] = [];
 	constructor(private type: 'active' | 'finished') {
@@ -218,9 +243,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 		const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLElement;
 		listEl.innerHTML = '';
 		for (const projectItem of this.assingedProjects) {
-			const listItem = document.createElement('li');
-			listItem.textContent = projectItem.title;
-			listEl.appendChild(listItem);
+			new ProjectItem(this.element.querySelector('ul')!.id, projectItem);
 		}
 	}
 
